@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 from matplotlib.colors import ListedColormap
 
-def plot_decision_regions(X, y, classifier, resolution=0.02, labels=None):
+def plot_decision_regions(X, y, classifier, resolution=0.02, labels=None, test_idx=None):
 
 	# setup marker generator and color map
 	markers = ('s', 'x', 'o', '^', 'v') 							# markers tuple
@@ -41,5 +41,12 @@ def plot_decision_regions(X, y, classifier, resolution=0.02, labels=None):
 			        alpha=0.8, c=cmap(idx), 
 			        label=labels[idx] if labels is not None else cl,
 			        marker=markers[idx])
+
+	# highlight test samples
+	if test_idx:
+		X_test, y_test = X[test_idx, :], y[test_idx]
+		plt.scatter(X_test[:, 0], X_test[:, 1], c='',
+			        alpha=1.0, linewidths=1, marker='o',
+			        s=55, label='test set')
 
 # EOF
