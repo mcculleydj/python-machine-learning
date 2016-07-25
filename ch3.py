@@ -171,10 +171,11 @@ plt.legend(loc='upper left')
 plt.show()
 
 # decision trees
+# do all of these assume two classes?
 
 def gini(p):
 	# return p * (1 - p) + (1 - p) * (1 - (1 - p))
-	return 2 * (p - p**2)
+	return 2 * (p - p**2)	# simplified formula for two classes
 
 def entropy(p):
 	return - p * np.log2(p) - (1 - p) * np.log2((1 - p))
@@ -202,5 +203,70 @@ plt.ylim([0, 1.1])
 plt.xlabel('p(i=1)')
 plt.ylabel('Impurity Index')
 plt.show()
+
+# growing a tree
+
+from sklearn.tree import DecisionTreeClassifier
+
+tree = DecisionTreeClassifier(criterion='entropy', max_depth=3, random_state=0)
+tree.fit(X_train, y_train)	# no need to stdize for tree methods
+
+X_combined = np.vstack((X_train, X_test))
+y_combined = np.hstack((y_train, y_test))
+
+pml_plot.plot_decision_regions(X_combined, y_combined, tree,
+	                           test_idx=range(105, 150), labels=labels)
+plt.xlabel('Petal Length [standardized]')
+plt.ylabel('Petal Width [standardized]')
+plt.legend(loc='upper left')
+plt.show()
+
+# make use of GraphViz
+
+from sklearn.tree import export_graphviz
+
+export_graphviz(tree, out_file='tree.dot',
+	            feature_names=['Petal Length', 'Petal Width'])
+
+# random forest
+
+from sklearn.ensemble import RandomForestClassifier
+
+forest = RandomForestClassifier(criterion='entropy', n_estimators=10,
+	                            random_state=1, n_jobs=2) 	# n_jobs uses two cores
+forest.fit(X_train, y_train)
+
+pml_plot.plot_decision_regions(X_combined, y_combined, forest,
+							   test_idx=range(105, 150), labels=labels)
+plt.xlabel('Petal Length [standardized]')
+plt.ylabel('Petal Width [standardized]')
+plt.legend(loc='upper left')
+plt.show()
+
+# knn
+
+from sklearn.neighbors import KNeighborsClassifier
+
+knn = KNeighborsClassifier(n_neighbors=5, p=2, metric='minkowski')
+knn.fit(X_train_std, y_train)
+
+pml_plot.plot_decision_regions(X_combined_std, y_combined, knn,
+							   test_idx=range(105, 150), labels=labels)
+plt.xlabel('Petal Length [standardized]')
+plt.ylabel('Petal Width [standardized]')
+plt.legend(loc='upper left')
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
 
 
