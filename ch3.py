@@ -98,16 +98,109 @@ plt.legend(loc='upper left')
 plt.xscale('log')
 plt.show()
 
+from sklearn.svm import SVC
 
+svm = SVC(kernel='linear', C=1.0, random_state=0)
+svm.fit(X_train_std, y_train)
 
+pml_plot.plot_decision_regions(X_combined_std,
+							   y_combined, svm,
+							   test_idx=range(105, 150),
+							   labels=labels)
+plt.xlabel('Petal Length [standardized]')
+plt.ylabel('Petal Width [standardized]')
+plt.legend(loc='upper left')
+plt.show()
 
+"""
+If the dataset is too large to fit into main memory
+then we need an online solution. The SGDClassifier
+types support the partial_fit method and a stochastic
+approach to updating the model.
+"""
 
+from sklearn.linear_model import SGDClassifier
 
+ppn = SGDClassifier(loss='perceptron')
+lr = SGDClassifier(loss='log')
+svm = SGDClassifier(loss='hinge')
 
+# handling nonlinear classification tasks
 
+np.random.seed(0)
+X_xor = np.random.randn(200, 2)
+y_xor = np.logical_xor(X_xor[:, 0] > 0, X_xor[:, 1] > 0)
+y_xor = np.where(y_xor, 1, -1)
 
+plt.scatter(X_xor[y_xor==1, 0], X_xor[y_xor==1, 1],
+	        c='b', marker='x', label='1')
+plt.scatter(X_xor[y_xor==-1, 0], X_xor[y_xor==-1, 1],
+	        c='r', marker='s', label='-1')
+plt.ylim(-3.0)
+plt.legend()
+plt.show()		# non-linearly separable data
 
+svm = SVC(kernel='rbf', gamma=0.10, C=10.0, random_state=0)
+svm.fit(X_xor, y_xor)
+pml_plot.plot_decision_regions(X_xor, y_xor, svm)
+plt.legend(loc='upper left')
+plt.show()
 
+# rbf applied to iris dataset
 
+svm = SVC(kernel='rbf', random_state=0, gamma=0.2, C=1.0)	# small gamma -> soft decision boundry
+svm.fit(X_train_std, y_train)
+pml_plot.plot_decision_regions(X_combined_std,
+							   y_combined, svm,
+							   test_idx=range(105, 150),
+							   labels=labels)
+plt.xlabel('Petal Length [standardized]')
+plt.ylabel('Petal Width [standardized]')
+plt.legend(loc='upper left')
+plt.show()
+
+svm = SVC(kernel='rbf', random_state=0, gamma=100.0, C=1.0) 	# large gamma -> hard decision boundry
+svm.fit(X_train_std, y_train)
+pml_plot.plot_decision_regions(X_combined_std,
+							   y_combined, svm,
+							   test_idx=range(105, 150),
+							   labels=labels)
+plt.xlabel('Petal Length [standardized]')
+plt.ylabel('Petal Width [standardized]')
+plt.legend(loc='upper left')
+plt.show()
+
+# decision trees
+
+def gini(p):
+	# return p * (1 - p) + (1 - p) * (1 - (1 - p))
+	return 2 * (p - p**2)
+
+def entropy(p):
+	return - p * np.log2(p) - (1 - p) * np.log2((1 - p))
+
+def error(p):
+	return 1 - np.max([p, 1 - p])
+
+x = np.arange(0.0, 1.0, 0.01)
+ent = [entropy(p) if p != 0 else None for p in x]
+sc_ent = [e*0.5 if e else None for e in ent]
+err = [error(i) for i in x]
+fig = plt.figure()
+ax = plt.subplot(111)
+for i, lab, ls, c, in zip([ent, sc_ent, gini(x), err],
+	                      ['Entropy', 'Entropy (scaled)',
+	                       'Gini Impurity', 'Misclassification Error'],
+	                      ['-', '-', '--', '-.'],
+	                      ['black', 'lightgray', 'red', 'green', 'cyan']):
+	line = ax.plot(x, i, label=lab, linestyle=ls, lw=2, color=c)
+ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), 
+	       ncol=3, fancybox=True, shadow=False)
+ax.axhline(y=0.5, linewidth=1, color='k', linestyle='--')
+ax.axhline(y=1.0, linewidth=1, color='k', linestyle='--')
+plt.ylim([0, 1.1])
+plt.xlabel('p(i=1)')
+plt.ylabel('Impurity Index')
+plt.show()
 
 
