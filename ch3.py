@@ -12,16 +12,19 @@ iris = datasets.load_iris()
 X = iris.data[:, [2, 3]]
 y = iris.target
 
-print('Class labels:', np.unique(y))
+print('Class labels:', np.unique(y))	# [0, 1, 2]
 
 from sklearn.cross_validation import train_test_split
 
-X_train, X_test, y_train, y_test = train_test_split(
+X_train, X_test, y_train, y_test = train_test_split( 	# find a more compact way
 	X, y, test_size=0.3, random_state=0)
 
 from sklearn.preprocessing import StandardScaler
 
 sc = StandardScaler()
+
+# can be written on one line: sc.fit_transform(X_train)
+
 sc.fit(X_train) 						# fit() estimates the sample mean and standard deviation
 X_train_std = sc.transform(X_train)		# transform standardizes the data
 X_test_std = sc.transform(X_test)		# same mean and variance used to transform test data
@@ -32,17 +35,35 @@ from sklearn.linear_model import Perceptron
 ppn = Perceptron(n_iter=40, eta0=0.1, random_state=0)
 ppn.fit(X_train_std, y_train)
 
+# do this with metrics instead: accuracy_score(y_test, y_pred)
 y_pred = ppn.predict(X_test_std)
 print('Misclassified samples: %d' % (y_test != y_pred).sum())
+
 
 from sklearn.metrics import accuracy_score
 
 print('Accuracy: %.2f' % accuracy_score(y_test, y_pred))
 
+# an alternative without having to import from metrics:
+#print('.score Accuracy: %.2f' % ppn.score(X_test_std, y_test))
+
+# plot_decision_regions expects the entire dataset with
+# testing following training data
+
+# a nice introdcution to stacking methods:
+# http://stackoverflow.com/questions/16473042/numpy-vstack-vs-column-stack
 X_combined_std = np.vstack((X_train_std, X_test_std))
 y_combined = np.hstack((y_train, y_test))
-labels = ['Setosa', 'Versicolor', 'Virginica']
-pml_plot.plot_decision_regions(X_combined_std, y_combined, ppn, test_idx=range(105, 150), labels=labels)
+
+labels = ['Setosa', 'Versicolor', 'Virginica'] 	# added parameter for plot_decision_regions
+
+# replace the hard-coded range for test_idx with something more general
+# combination along with the index of the first training sample
+# should be handled in a single function call: pml_plot.combined()
+
+X_combined_std, y_combined, test_idx = pml_plot.combine(X_train_std, X_test_std, y_train, y_test)
+pml_plot.plot_decision_regions(X_combined_std, y_combined, ppn, 
+	                           test_idx=test_idx, labels=labels)
 plt.xlabel('Petal Length [standardized]')
 plt.ylabel('Petal Width [standardized]')
 plt.legend(loc='upper left')
@@ -257,16 +278,4 @@ plt.ylabel('Petal Width [standardized]')
 plt.legend(loc='upper left')
 plt.show()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+# EOF

@@ -44,9 +44,15 @@ def plot_decision_regions(X, y, classifier, resolution=0.02, labels=None, test_i
 
 	# highlight test samples
 	if test_idx:
-		X_test, y_test = X[test_idx, :], y[test_idx]
+		# X_test, y_test = X[test_idx, :], y[test_idx]
+		X_test, y_test = X[range(test_idx, X.shape[0]), :], y[range(test_idx, y.shape[0])]
 		plt.scatter(X_test[:, 0], X_test[:, 1], c='',
 			        alpha=1.0, linewidths=1, marker='o',
 			        s=55, label='Test Set')
+
+def combine(X_trn, X_tst, y_trn, y_tst):
+	X_cmb = np.vstack((X_trn, X_tst))
+	y_cmb = np.hstack((y_trn, y_tst))
+	return X_cmb, y_cmb, X_trn.shape[0]
 
 # EOF
