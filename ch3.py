@@ -1,5 +1,5 @@
 """
-Implementation of the examples in Chapter 2
+Implementation of the examples in Chapter 3
 """
 
 import numpy as np
@@ -16,7 +16,7 @@ print('Class labels:', np.unique(y))	# [0, 1, 2]
 
 from sklearn.cross_validation import train_test_split
 
-X_train, X_test, y_train, y_test = train_test_split( 	# find a more compact way
+X_train, X_test, y_train, y_test = train_test_split( 	# future work: write a more compact way
 	X, y, test_size=0.3, random_state=0)
 
 from sklearn.preprocessing import StandardScaler
@@ -39,13 +39,15 @@ ppn.fit(X_train_std, y_train)
 y_pred = ppn.predict(X_test_std)
 print('Misclassified samples: %d' % (y_test != y_pred).sum())
 
-
 from sklearn.metrics import accuracy_score
 
-print('Accuracy: %.2f' % accuracy_score(y_test, y_pred))
+# in Python 3: '%.2f' % 3.55 -> 3.5 ... '%.2f' % 3.551 -> 3.6
+# so round() may be a better option
+
+print('Accuracy: ' % round(accuracy_score(y_test, y_pred)), 2)
 
 # an alternative without having to import from metrics:
-#print('.score Accuracy: %.2f' % ppn.score(X_test_std, y_test))
+# print('Accuracy: %.2f' % ppn.score(X_test_std, y_test))
 
 # plot_decision_regions expects the entire dataset with
 # testing following training data
@@ -90,11 +92,12 @@ plt.ylabel('$\phi $ (z)')
 plt.show()
 
 # consider generating the plot shown plotting J(w) as a function of Phi(z)
+# as shown in text, but not coded
 
 from sklearn.linear_model import LogisticRegression
 lr = LogisticRegression(C=1000.0, random_state=0)
 lr.fit(X_train_std, y_train)
-pml_plot.plot_decision_regions(X_combined_std, y_combined, lr, test_idx=range(105, 150), labels=labels)
+pml_plot.plot_decision_regions(X_combined_std, y_combined, lr, test_idx=test_idx, labels=labels)
 plt.xlabel('Petal Length [standardized]')
 plt.ylabel('Petal Width [standardized]')
 plt.legend(loc='upper left')
@@ -126,7 +129,7 @@ svm.fit(X_train_std, y_train)
 
 pml_plot.plot_decision_regions(X_combined_std,
 							   y_combined, svm,
-							   test_idx=range(105, 150),
+							   test_idx=test_idx,
 							   labels=labels)
 plt.xlabel('Petal Length [standardized]')
 plt.ylabel('Petal Width [standardized]')
@@ -173,7 +176,7 @@ svm = SVC(kernel='rbf', random_state=0, gamma=0.2, C=1.0)	# small gamma -> soft 
 svm.fit(X_train_std, y_train)
 pml_plot.plot_decision_regions(X_combined_std,
 							   y_combined, svm,
-							   test_idx=range(105, 150),
+							   test_idx=test_idx,
 							   labels=labels)
 plt.xlabel('Petal Length [standardized]')
 plt.ylabel('Petal Width [standardized]')
@@ -184,7 +187,7 @@ svm = SVC(kernel='rbf', random_state=0, gamma=100.0, C=1.0) 	# large gamma -> ha
 svm.fit(X_train_std, y_train)
 pml_plot.plot_decision_regions(X_combined_std,
 							   y_combined, svm,
-							   test_idx=range(105, 150),
+							   test_idx=test_idx,
 							   labels=labels)
 plt.xlabel('Petal Length [standardized]')
 plt.ylabel('Petal Width [standardized]')
@@ -236,7 +239,7 @@ X_combined = np.vstack((X_train, X_test))
 y_combined = np.hstack((y_train, y_test))
 
 pml_plot.plot_decision_regions(X_combined, y_combined, tree,
-	                           test_idx=range(105, 150), labels=labels)
+	                           test_idx=test_idx, labels=labels)
 plt.xlabel('Petal Length [standardized]')
 plt.ylabel('Petal Width [standardized]')
 plt.legend(loc='upper left')
@@ -258,7 +261,7 @@ forest = RandomForestClassifier(criterion='entropy', n_estimators=10,
 forest.fit(X_train, y_train)
 
 pml_plot.plot_decision_regions(X_combined, y_combined, forest,
-							   test_idx=range(105, 150), labels=labels)
+							   test_idx=test_idx, labels=labels)
 plt.xlabel('Petal Length [standardized]')
 plt.ylabel('Petal Width [standardized]')
 plt.legend(loc='upper left')
@@ -272,7 +275,7 @@ knn = KNeighborsClassifier(n_neighbors=5, p=2, metric='minkowski')
 knn.fit(X_train_std, y_train)
 
 pml_plot.plot_decision_regions(X_combined_std, y_combined, knn,
-							   test_idx=range(105, 150), labels=labels)
+							   test_idx=test_idx, labels=labels)
 plt.xlabel('Petal Length [standardized]')
 plt.ylabel('Petal Width [standardized]')
 plt.legend(loc='upper left')

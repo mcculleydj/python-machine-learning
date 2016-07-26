@@ -1,8 +1,14 @@
+"""
+Implementation of plotting methods
+for use with the examples in Python Machine Learning
+"""
 
 import numpy as np
 import matplotlib.pyplot as plt
 
 from matplotlib.colors import ListedColormap
+
+# note that this method is restricted to five classes
 
 def plot_decision_regions(X, y, classifier, resolution=0.02, labels=None, test_idx=None):
 
@@ -16,12 +22,20 @@ def plot_decision_regions(X, y, classifier, resolution=0.02, labels=None, test_i
 	x2_min, x2_max = X[:, 1].min() - 1, X[:, 1].max() + 1 			# determine y bounds
 
 	# numpy.arange(start, stop, step) returns an evenly spaced ndarray
-	# numpy.meshgrid(arr1, arr2)
+	# numpy.meshgrid(arr1, arr2) -> list of ndarrays
+	# |a1| = m and |a2| = n
+	# meshgrid(a1, a2)[0] = [[-a1-],                      	m by n that stacks m a1 row vectors
+	#                        [-a1-],
+	#                         ...,
+	#                        [-a1-]]
+	# meshgrid(a1, a2)[1] = [[ |  ]  [ |  ]       [ |  ]]   n by m that stacks n a2 col vectors
+	#                       [[ a2 ], [ a2 ], ..., [ a2 ]]
+	#                       [[ |  ]  [ |  ]       [ |  ]]
 
 	xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, resolution),
 		                   np.arange(x2_min, x2_max, resolution))
 
-	# ndarray.ravel() flattens the array into a linear sequence:
+	# ndarray.ravel() flattens the array into a 1-D sequence:
 	# e.g. [[1, 3], [2, 4]].ravel() = [1, 3, 2, 4]
 	# ndarray.T returns the tranpose
 	# so [[1, 3], [2, 4]].T.ravel() = [1, 2, 3, 4]

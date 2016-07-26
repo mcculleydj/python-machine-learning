@@ -33,45 +33,50 @@ X = df.iloc[0:100, [0, 2]].values			# select the first 100 rows and
 
 # plot the data
 
-# plt.scatter(X[:50, 0], X[:50, 1], color='red', marker='o', label='Setosa') 				# plot setosa pts
-# plt.scatter(X[50:100, 0], X[50:100, 1], color='blue', marker='x', label='Versicolor') 	# plot versicolor pts
-# plt.xlabel('Sepal Length [cm]')
-# plt.ylabel('Petal Length [cm]')
-# plt.legend(loc='upper left')
-# ax = plt.gca()
-# ax.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-# plt.show()
+plt.scatter(X[:50, 0], X[:50, 1], 
+            color='red', marker='o', label='Setosa') 		# plot setosa pts
+plt.scatter(X[50:100, 0], X[50:100, 1],
+            color='blue', marker='x', label='Versicolor') 	# plot versicolor pts
+plt.xlabel('Sepal Length [cm]')
+plt.ylabel('Petal Length [cm]')
+plt.legend(loc='upper left')
+ax = plt.gca()
+ax.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+plt.show()
 
-# # train perceptron classifier
+# train perceptron classifier
 
-# ppn = perceptron.Perceptron(eta=0.1, n_iter=10) 		# instantiate a perceptron object
-# ppn.fit(X, y) 											# call fit(X, y) to train algorithm
+ppn = perceptron.Perceptron(eta=0.1, n_iter=10) 		# instantiate a perceptron object
+ppn.fit(X, y) 											# call fit(X, y) to train algorithm
 
-# # plot number of errors at each epoch
+# plot number of errors at each epoch
 
-# plt.plot(range(1, len(ppn.errors_) + 1), ppn.errors_, marker='o')
-# plt.xlim([1, len(ppn.errors_)])
-# plt.ylim([0, max(ppn.errors_) + 1])
-# plt.xticks(np.arange(1, len(ppn.errors_) + 1, 1))
-# plt.yticks(np.arange(0, max(ppn.errors_) + 2, 1))
-# plt.xlabel('Epochs')
-# plt.ylabel('Number of Misclassifcations')
-# plt.show()
+plt.plot(range(1, len(ppn.errors_) + 1), ppn.errors_, marker='o')
+plt.xlim([1, len(ppn.errors_)])							# assume epochs start at 1
+plt.ylim([0, max(ppn.errors_) + 1])						# use max to bound the axis
+plt.xticks(np.arange(1, len(ppn.errors_) + 1, 1))		# +1 because range is non-incl
+plt.yticks(np.arange(0, max(ppn.errors_) + 2, 1))		# +2 because non-incl and want 1 higher
+plt.title('Convergence of Percepton')
+plt.xlabel('Epochs')
+plt.ylabel('Number of Misclassifcations')
+plt.show()
 
-# # plot decision regions
+# plot decision regions
 
 labels = ['Setosa', 'Versicolor']
-# pml_plot.plot_decision_regions(X, y, classifier=ppn, labels=labels)
-# plt.xlabel('Sepal Length [cm]')
-# plt.ylabel('Petal Length [cm]')
-# plt.legend(loc='upper left')
-# plt.show()
+pml_plot.plot_decision_regions(X, y, classifier=ppn, labels=labels)
+plt.title('Perceptron Decision Regions')
+plt.xlabel('Sepal Length [cm]')
+plt.ylabel('Petal Length [cm]')
+plt.legend(loc='upper left')
+plt.show()
 
 # Adaline
 
 # create a figure for two plots
 
 fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(12,6))
+# ax is a (2,) ndarray containing two axis objects
 
 # ada1 will diverge because eta is too large
 
@@ -94,6 +99,7 @@ plt.show()
 # we can prevent divergence by standardizing the training set
 # this prevents the scale of variables from impacting the algorithm
 # see sklearn standardization methods for an off-the-shelf method
+# which is used in ch3.py
 
 X_std = np.copy(X)
 X_std[:,0] = (X[:,0] - X[:,0].mean()) / X[:,0].std()
@@ -105,7 +111,6 @@ plt.title('Adaline - Gradient Descent')
 plt.xlabel('Sepal Length [standardized]')
 plt.ylabel('Petal Length [standardized]')
 plt.legend(loc='upper left')
-
 plt.show()
 
 plt.plot(range(1, len(ada.cost_) + 1), ada.cost_, marker='o')
@@ -114,8 +119,7 @@ plt.ylim([0, max(ada.cost_) + 1])
 plt.xticks(np.arange(1, len(ada.cost_) + 1, 1))
 plt.xlabel('Epochs')
 plt.ylabel('Sum-squared-error')
-plt.title('Convergence Batch GD')
-
+plt.title('Convergence of Adaline w/ Batch GD')
 plt.show()
 
 # AdalineSGD
@@ -123,7 +127,7 @@ plt.show()
 ada = adaline_sgd.AdalineSGD(n_iter=15, eta=0.01, random_state=1).fit(X_std, y)
 
 pml_plot.plot_decision_regions(X_std, y, classifier=ada, labels=labels)
-plt.title('Adaline - Stochastic Gradient Descent')
+plt.title('Adaline w/ Stochastic GD - Decision Regions')
 plt.xlabel('Sepal length [standardized]')
 plt.ylabel('Petal length [standardized]')
 plt.legend(loc='upper left')
