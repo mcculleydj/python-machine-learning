@@ -1,5 +1,5 @@
 """
-Implementation of the examples in Chapter 3
+Python Machine Learning - Chapter 3
 """
 
 import numpy as np
@@ -7,44 +7,48 @@ import pml_plot
 import matplotlib.pyplot as plt
 
 from sklearn import datasets
+from sklearn.cross_validation import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import Perceptron
 
-iris = datasets.load_iris()
-X = iris.data[:, [2, 3]]
-y = iris.target
+iris = datasets.load_iris()				# import dataset
+X = iris.data[:, [2, 3]] 				# project(petal length, petal width)
+y = iris.target							# project(species)
 
 print('Class labels:', np.unique(y))	# [0, 1, 2]
 
-from sklearn.cross_validation import train_test_split
+# create shorthand for train_test_split()
 
-X_train, X_test, y_train, y_test = train_test_split( 	# future work: write a more compact way
-	X, y, test_size=0.3, random_state=0)
+tts = lambda X, y: train_test_split(X, y, test_size=0.3, random_state=0)
 
-from sklearn.preprocessing import StandardScaler
+X_train, X_test, y_train, y_test = tts(X, y)	# split the dataset
 
 sc = StandardScaler()
 
-# can be written on one line: sc.fit_transform(X_train)
+# next two lines can be written on one line: sc.fit_transform(X_train)
 
 sc.fit(X_train) 						# fit() estimates the sample mean and standard deviation
 X_train_std = sc.transform(X_train)		# transform standardizes the data
-X_test_std = sc.transform(X_test)		# same mean and variance used to transform test data
+X_test_std = sc.transform(X_test)		# use the same mean and variance to transform test data
 										# test and training data must remain comparable
 
-from sklearn.linear_model import Perceptron
+ppn = Perceptron(n_iter=40, eta0=0.1, random_state=0)	# instantiate a Perceptron object
+ppn.fit(X_train_std, y_train) 							# call fit(X, y) to train algorithm
+y_pred = ppn.predict(X_test_std)						# generate a prediction vector
 
-ppn = Perceptron(n_iter=40, eta0=0.1, random_state=0)
-ppn.fit(X_train_std, y_train)
+# in Numpy ndarrays can be compared element by element
 
-# do this with metrics instead: accuracy_score(y_test, y_pred)
-y_pred = ppn.predict(X_test_std)
 print('Misclassified samples: %d' % (y_test != y_pred).sum())
+
+# do the same with sklearn.metrics instead
 
 from sklearn.metrics import accuracy_score
 
 # in Python 3: '%.2f' % 3.55 -> 3.5 ... '%.2f' % 3.551 -> 3.6
 # so round() may be a better option
+# for results of Numpy ops np.set_printoptions(precision=2)
 
-print('Accuracy: ' % round(accuracy_score(y_test, y_pred)), 2)
+print('Accuracy: ', round(accuracy_score(y_test, y_pred), 2))
 
 # an alternative without having to import from metrics:
 # print('Accuracy: %.2f' % ppn.score(X_test_std, y_test))
