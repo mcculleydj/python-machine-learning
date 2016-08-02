@@ -42,6 +42,7 @@ plt.ylabel('Petal Length [cm]')
 plt.legend(loc='upper left')
 ax = plt.gca()
 ax.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+plt.title('Iris Data')
 plt.show()
 
 # train perceptron classifier
